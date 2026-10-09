@@ -13,9 +13,11 @@ def load(name):
         return json.load(f)
 
 
-def main(baseline, candidate):
+def main(baseline, candidate, eval_baseline=None, eval_candidate=None):
+    eval_baseline = eval_baseline or baseline
+    eval_candidate = eval_candidate or candidate
     bb, cb = load(f"{baseline}.json"), load(f"{candidate}.json")
-    be, ce = load(f"eval-{baseline}.json"), load(f"eval-{candidate}.json")
+    be, ce = load(f"eval-{eval_baseline}.json"), load(f"eval-{eval_candidate}.json")
 
     # Quality: paired comparison on the same questions
     a, b = be["correct"], ce["correct"]
@@ -52,4 +54,4 @@ def main(baseline, candidate):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2])
+        main(*sys.argv[1:5])
