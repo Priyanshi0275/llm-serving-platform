@@ -10,7 +10,14 @@ OUT.mkdir(exist_ok=True)
 LABEL = "fp16"
 
 with open(RESULTS / f"metrics-{LABEL}.json") as f:
-    samples = json.load(f)
+    raw = sorted(json.load(f), key=lambda s: s["t"])
+samples, last_t, last_gen = [], -1e9, -1.0
+for s in raw:
+    g = s.get("vllm:generation_tokens_total", 0.0)
+    if s["t"] - last_t < 0.9 or g < last_gen:
+        continue                     # skip duplicate-recorder samples
+    samples.append(s)
+    last_t, last_gen = s["t"], g
 
 # Trim idle time before and after the load test
 tok_all = [s.get("vllm:generation_tokens_total", 0.0) for s in samples]
